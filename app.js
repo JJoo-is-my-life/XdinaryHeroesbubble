@@ -615,8 +615,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     initMember();
   }else if(path.endsWith("chat.html")){
     initChat();
-  }else if(path.endsWith("view.html")){ // ⭐ 새 페이지 경로 추가
-    initView();
+  }else if(path.endsWith("view.html")){
+    initView(); // view.html 페이지 초기화
   }
 
   // --- 기존 미디어 팝업 버튼 이벤트 리스너 (member.html, chat.html용) ---
@@ -630,18 +630,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
     });
   }
-  // showNextMedia, showPrevMedia 함수는 공통으로 사용하지만,
-  // 호출 시 각 페이지의 DOM 요소를 인자로 넘겨줘야 합니다.
-  // 이 부분은 openMediaModal 함수 내부에서 처리되므로, 여기서는 별도의 리스너 추가 불필요합니다.
-  // 만약 팝업 외부에서 직접 버튼을 정의하고 사용하려면 여기에 추가해야 합니다.
-
 
   // --- ⭐ 새로운 미디어 팝업 버튼 이벤트 리스너 (view.html용) ⭐ ---
   if (closeMediaBtnView) {
     closeMediaBtnView.addEventListener('click', closeMediaModalView);
   }
   if (mediaModalView) {
-    // 모달 배경 클릭 시 닫기
     mediaModalView.addEventListener('click', (e) => {
         if (e.target === mediaModalView) {
             closeMediaModalView();
@@ -649,9 +643,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
   if (prevMediaBtnView) {
+    // view.html의 showPrevMedia는 모든 관련 DOM 요소를 인자로 받습니다.
     prevMediaBtnView.addEventListener('click', () => showPrevMedia(prevMediaBtnView, nextMediaBtnView, modalImageView, modalVideoView, downloadMediaBtnView));
   }
   if (nextMediaBtnView) {
+    // view.html의 showNextMedia는 모든 관련 DOM 요소를 인자로 받습니다.
     nextMediaBtnView.addEventListener('click', () => showNextMedia(prevMediaBtnView, nextMediaBtnView, modalImageView, modalVideoView, downloadMediaBtnView));
   }
 });
