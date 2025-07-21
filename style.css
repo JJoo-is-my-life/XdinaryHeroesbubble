@@ -1,0 +1,549 @@
+/* style.css */
+
+/* 전역 변수 */
+:root {
+  --accent: #4D8DFF;
+  --accent-dark: #1f5be5;
+  --bg: #ffffff;
+  --bg-card: #ffffff;
+  --bg-chat: #f5f5f7;
+  --bg-artist: #e5efff;
+  --text-strong: #111;
+  --text: #333;
+  --text-light: #888;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --shadow-card: 0 4px 20px rgba(0,0,0,.08);
+  --header-h: 56px;
+  --tabbar-h: 60px;
+  --app-max-w: 420px;
+}
+
+html,body {
+  margin:0; padding:0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background:#000;
+  color:var(--text);
+}
+
+.app-bg {
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+}
+
+.app-frame {
+  background:var(--bg);
+  width:100%;
+  max-width:var(--app-max-w);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  margin:0 auto;
+  overflow: hidden;
+}
+
+/* 공통 뒤로가기/닫기 버튼 */
+.exit-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.exit-button:hover {
+  color: #ff5b5b;
+}
+
+/* 앱 헤더 */
+.app-header {
+  height:var(--header-h);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid #e0e0e0;
+}
+
+.app-header--center .app-title {
+  margin:0;
+  font-size:18px;
+  font-weight:600;
+}
+
+/* 아카이브 목록 (멤버 리스트) */
+.archive-list {
+  flex:1;
+  overflow-y:auto;
+  padding:8px 0 80px;
+}
+
+.archive-row {
+  display:flex;
+  align-items:center;
+  padding:8px 16px;
+  text-decoration:none;
+  color:inherit;
+}
+
+.archive-row:hover {
+  background:rgba(77,141,255,.08);
+}
+
+.archive-row + .archive-row {
+  border-top:1px solid #f2f2f2;
+}
+
+.archive-row-avatar-wrap {
+  position:relative;
+  margin-right:12px;
+}
+
+.archive-row-avatar {
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  object-fit:cover;
+  background:#dfe8ff;
+}
+
+.archive-row-name {
+  font-size:16px;
+  font-weight:600;
+}
+
+.archive-row-status {
+  margin-left:auto;
+  font-size:12px;
+  color:var(--text-light);
+}
+
+/* 앱 하단 탭바 */
+.app-tabbar {
+  position:sticky;
+  bottom:0;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  height:var(--tabbar-h);
+  border-top:1px solid #e0e0e0;
+  background:var(--bg);
+  z-index:10;
+}
+
+.tab-btn {
+  flex:1;
+  height:100%;
+  background:none;
+  border:none;
+  font-size:14px;
+  color:var(--text-light);
+  cursor:pointer;
+}
+
+.tab-btn--active {
+  color:var(--accent);
+  font-weight:600;
+}
+
+/* 멤버 프로필 페이지 전용 스타일 */
+.app-frame--profile {
+  overflow:hidden;
+}
+
+.member-bg-wrap {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  z-index:0;
+}
+
+.member-bg {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:blur(8px) brightness(.7);
+  cursor: pointer; /* 배경 이미지 클릭 가능하도록 커서 변경 */
+}
+
+.member-profile-card {
+  position:relative;
+  margin-top:40vh;
+  margin-inline:auto;
+  width:90%;
+  max-width:300px;
+  background:rgba(255,255,255,.9);
+  padding:32px 16px;
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);
+  text-align:center;
+  z-index:10;
+}
+
+.member-profile-img {
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:50%;
+  border:4px solid var(--accent);
+  margin-top:-90px;
+  background:#fff;
+  cursor: pointer; /* 프로필 이미지 클릭 가능하도록 커서 변경 */
+}
+
+.member-name {
+  margin:16px 0 8px;
+  font-size:20px;
+  font-weight:700;
+}
+
+/* 공통 버튼 스타일 */
+.primary-btn {
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:12px 24px;
+  font-size:16px;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  transition:background 0.2s;
+}
+
+.primary-btn:active {
+  background:var(--accent-dark);
+}
+
+.wide-btn {
+  display:block;
+  width:100%;
+}
+
+.secondary-btn {
+  background:#e0e0e0;
+  border:none;
+  padding:8px 16px;
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+
+.secondary-btn:active {
+  background:#cacaca;
+}
+
+/* 채팅 페이지 전용 스타일 */
+.app-frame--chat {
+  background:var(--bg-chat);
+}
+
+.chat-header {
+  position:sticky;
+  top:0;
+  height:var(--header-h);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg);
+  border-bottom:1px solid #e0e0e0;
+  z-index:5;
+}
+
+.chat-header-title {
+  margin:0;
+  font-size:18px;
+  font-weight:600;
+}
+
+.chat-scroll {
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  justify-content: flex-end;
+}
+
+/* 채팅 메시지 공통 스타일 */
+.chat-msg-wrap {
+  display: flex; /* ⭐⭐ 플렉스 컨테이너로 설정하여 자식 요소를 가로로 배열 ⭐⭐ */
+  align-items: flex-end; /* ⭐⭐ 말풍선과 시간을 하단 기준으로 정렬 ⭐⭐ */
+  max-width: 80%; /* 랩의 최대 너비 */
+  margin-bottom: 8px; /* 각 메시지 덩어리 사이 간격 */
+}
+
+.chat-msg {
+  padding:10px 14px;
+  border-radius:18px;
+  font-size:15px;
+  line-height:1.4;
+  word-break:break-word;
+  background:var(--bg-artist);
+  color:var(--text-strong);
+  display: inline-block; /* 내용 길이에 맞춰 너비 조절 */
+  /* 이미지/동영상 메시지의 경우 배경색 제거 */
+  background: none; 
+  padding: 0; /* 이미지/동영상은 말풍선 패딩 제거 */
+}
+
+/* 텍스트 메시지 전용 스타일 (말풍선 배경색 다시 적용) */
+.chat-msg:not(:has(img)):not(:has(video)) {
+  background:var(--bg-artist);
+  padding:10px 14px;
+}
+
+/* 채팅 메타 정보 (시간) */
+.chat-meta {
+  font-size:11px;
+  color:var(--text-light);
+  white-space: nowrap; /* 시간이 줄바꿈되지 않도록 */
+  margin-left: 4px; /* ⭐⭐ 말풍선과 시간 사이의 간격 ⭐⭐ */
+}
+
+/* ⭐⭐⭐ 이미지 및 동영상 메시지 스타일 ⭐⭐⭐ */
+.chat-media-image,
+.chat-media-video {
+  max-width: 250px; /* 이미지/동영상 최대 너비 */
+  max-height: 250px; /* 이미지/동영상 최대 높이 */
+  border-radius: var(--radius-md); /* 모서리 둥글게 */
+  object-fit: cover;
+  display: block; /* 줄 바꿈 방지 및 너비 조절을 위해 */
+}
+
+.chat-media-video {
+  width: 100%; /* 부모 너비에 맞춤 */
+  height: auto;
+}
+
+/* 날짜 구분선 */
+.chat-date-sep {
+  align-self:center;
+  margin:16px 0 8px;
+  padding:4px 12px;
+  font-size:12px;
+  color:var(--text-light);
+  background:rgba(0,0,0,.05);
+  border-radius:16px;
+}
+
+/* 공통 숨김 클래스 */
+.hidden {
+  display: none !important; /* 모달을 숨기는 스타일 */
+}
+
+/* 모달 (닉네임 설정 등) */
+.modal {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.modal-card {
+  width:80%;
+  max-width:300px; /* 닉네임 팝업의 max-width */
+  background:var(--bg);
+  padding:24px 16px;
+  border-radius:var(--radius-md);
+  text-align:center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.modal-card h3, .modal-card h4 {
+  margin-top: 0;
+}
+
+textarea, select,
+input[type="text"], input[type="date"], input[type="password"], input[type="datetime-local"], input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top: 16px;
+}
+
+/* ⭐ 미디어 확대 팝업 스타일 수정 ⭐ */
+.media-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9); /* 어두운 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 다른 요소들 위에 표시 */
+}
+
+.media-modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* 추가: 자식 요소를 세로로 배열 */
+  justify-content: center; /* 세로 중앙 정렬 */
+  align-items: center; /* 가로 중앙 정렬 */
+  max-width: var(--app-max-w); /* --app-max-w (420px)를 따르거나, 필요시 조정 */
+  max-height: 90vh; /* 뷰포트 높이의 90% */
+  padding: 20px; /* 콘텐츠와 모달 테두리 사이의 패딩 추가 */
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+  background-color: rgba(0, 0, 0, 0.5); /* 팝업 콘텐츠 배경색 (선택 사항) */
+  border-radius: var(--radius-md); /* 팝업 콘텐츠 모서리 둥글게 */
+}
+
+.modal-media {
+  max-width: 100%; /* 부모 요소(media-modal-content)의 최대 너비까지 */
+  height: auto; /* 높이는 비율에 맞춰 자동 조정 */
+  object-fit: contain; /* 이미지/동영상 비율 유지하며 잘리지 않게 표시 */
+  border-radius: var(--radius-md); /* 기존 말풍선과 유사하게 둥근 모서리 */
+  display: block; /* 줄 바꿈 방지 */
+  margin-bottom: 10px; /* 미디어와 버튼 사이 간격 */
+}
+
+.media-modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1001; /* 버튼이 미디어 위에 표시되도록 */
+  padding: 5px 10px;
+  border-radius: 50%; /* 둥근 버튼 */
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+}
+
+.media-modal-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.media-modal-download-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none; /* 링크 밑줄 제거 */
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 아이콘과 텍스트 사이 간격 */
+  z-index: 1001; /* 버튼이 미디어 위에 표시되도록 */
+}
+
+.media-modal-download-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+
+/* ⭐ viewer.html 전용 스타일 (member.html과 유사하지만 구분) ⭐ */
+.app-frame--profile-viewer {
+  overflow: hidden;
+  background: var(--bg); /* 기본 배경색 */
+}
+
+.viewer-bg-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.viewer-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.7); /* 흐림 효과는 제거하고 어둡게만 */
+  cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+.viewer-profile-card {
+  position: relative;
+  margin-top: 40vh; /* member.html과 유사한 위치 */
+  margin-inline: auto;
+  width: 90%;
+  max-width: 300px;
+  background: rgba(255,255,255,.9);
+  padding: 32px 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  z-index: 10;
+}
+
+.viewer-profile-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  margin-top: -90px;
+  background: #fff;
+  cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+.viewer-name {
+  margin: 16px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ⭐ 미디어 팝업 내비게이션 버튼 (좌우 화살표) ⭐ */
+.media-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 1002; /* 닫기/저장 버튼 위에 */
+  transition: background-color 0.2s;
+}
+
+.media-nav-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.media-nav-btn--prev {
+  left: 20px;
+}
+
+.media-nav-btn--next {
+  right: 20px;
+}
+
+.media-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
