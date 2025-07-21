@@ -92,90 +92,66 @@ async function initMember(){
   const nameEl=qs("#memberDisplayName");
   const btn=qs("#viewChatBtn");
 
+  // 배경 이미지 및 히스토리 데이터 로딩
+  let backgroundHistory = [];
   if(bg) {
     bg.src=backgroundSrc(id);
     bg.onerror=()=>{bg.src="images/default_background.jpg";}
-
     try {
         const res = await fetch(historyDataSrc(id, 'background'));
-        let historyData = [];
         if(res.ok) {
             const csvText = await res.text();
             const rawHistory = parseCsv(csvText);
             const sortedHistory = rawHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-            historyData = sortedHistory.map(item => ({ ...item, type_orig: 'background', type: getMediaType(item.path) }));
+            backgroundHistory = sortedHistory.map(item => ({ ...item, type_orig: 'background', type: getMediaType(item.path) }));
+            if (backgroundHistory.length > 0) bg.src = backgroundHistory[0].path;
         } else if (res.status === 404) {
              console.warn(`No background history CSV found for ${id}. Using current image only.`);
         } else {
             console.error(`Failed to load background history for ${id}. Status: ${res.status}`);
         }
-
-        if (historyData.length > 0) {
-            bg.src = historyData[0].path;
-        }
-
-        // ⭐ 기존 배경 이미지 클릭 이벤트 수정 ⭐
-        bg.addEventListener("click", () => {
-            if (historyData.length > 0) {
-                // 히스토리가 있다면 최신 이미지부터 팝업 열기
-                openMediaModal(historyData[0].path, historyData[0].type, historyData, 0);
-            } else {
-                // 히스토리가 없다면 현재 배경 이미지만으로 팝업 열기
-                openMediaModal(bg.src, getMediaType(bg.src), [{ path: bg.src, type: getMediaType(bg.src), type_orig: 'background' }], 0);
-            }
-        });
     } catch (error) {
         console.error("Error loading background history:", error);
-        // 오류 발생 시에도 현재 이미지로 팝업을 열 수 있도록 폴백 처리
-        if (bg) {
-            bg.addEventListener("click", () => {
-                openMediaModal(bg.src, getMediaType(bg.src), [{ path: bg.src, type: getMediaType(bg.src), type_orig: 'background' }], 0);
-            });
-        }
     }
+    // 배경 이미지 클릭 시 팝업 열기
+    bg.addEventListener("click", () => {
+        if (backgroundHistory.length > 0) {
+            openMediaModal(backgroundHistory[0].path, backgroundHistory[0].type, backgroundHistory, 0);
+        } else {
+            openMediaModal(bg.src, getMediaType(bg.src), [{ path: bg.src, type: getMediaType(bg.src), type_orig: 'background' }], 0);
+        }
+    });
   }
 
+  // 프로필 이미지 및 히스토리 데이터 로딩
+  let profileHistory = [];
   if(prof){
     prof.src=profileSrc(id);
     prof.onerror=()=>{prof.src="images/default_profile.jpg";}
-
     try {
         const res = await fetch(historyDataSrc(id, 'profile'));
-        let historyData = [];
         if(res.ok) {
             const csvText = await res.text();
             const rawHistory = parseCsv(csvText);
             const sortedHistory = rawHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-            historyData = sortedHistory.map(item => ({ ...item, type_orig: 'profile', type: getMediaType(item.path) }));
+            profileHistory = sortedHistory.map(item => ({ ...item, type_orig: 'profile', type: getMediaType(item.path) }));
+            if (profileHistory.length > 0) prof.src = profileHistory[0].path;
         } else if (res.status === 404) {
             console.warn(`No profile history CSV found for ${id}. Using current image only.`);
         } else {
             console.error(`Failed to load profile history for ${id}. Status: ${res.status}`);
         }
-
-        if (historyData.length > 0) {
-            prof.src = historyData[0].path;
-        }
-
-        // ⭐ 기존 프로필 이미지 클릭 이벤트 수정 ⭐
-        prof.addEventListener("click", () => {
-            if (historyData.length > 0) {
-                // 히스토리가 있다면 최신 이미지부터 팝업 열기
-                openMediaModal(historyData[0].path, historyData[0].type, historyData, 0);
-            } else {
-                // 히스토리가 없다면 현재 프로필 이미지만으로 팝업 열기
-                openMediaModal(prof.src, getMediaType(prof.src), [{ path: prof.src, type: getMediaType(prof.src), type_orig: 'profile' }], 0);
-            }
-        });
     } catch (error) {
         console.error("Error loading profile history:", error);
-        // 오류 발생 시에도 현재 이미지로 팝업을 열 수 있도록 폴백 처리
-        if (prof) {
-            prof.addEventListener("click", () => {
-                openMediaModal(prof.src, getMediaType(prof.src), [{ path: prof.src, type: getMediaType(prof.src), type_orig: 'profile' }], 0);
-            });
-        }
     }
+    // 프로필 이미지 클릭 시 팝업 열기
+    prof.addEventListener("click", () => {
+        if (profileHistory.length > 0) {
+            openMediaModal(profileHistory[0].path, profileHistory[0].type, profileHistory, 0);
+        } else {
+            openMediaModal(prof.src, getMediaType(prof.src), [{ path: prof.src, type: getMediaType(prof.src), type_orig: 'profile' }], 0);
+        }
+    });
   }
 
   if(nameEl) nameEl.textContent=disp;
@@ -237,7 +213,6 @@ function parseCsv(csvText) {
   }
   return result;
 }
-
 
 // ⭐ 추가: 미디어 모달 관련 DOM 요소 참조 변수 ⭐
 const mediaModal = qs("#mediaModal");
@@ -471,40 +446,4 @@ function saveNickname(){
     setNickname(nick);
     closeNickModal();
     if(currentMemberId){
-      loadChatData(currentMemberId);
-    }
-  } else {
-    alert("닉네임을 입력해주세요!");
-  }
-}
-
-
-/* 페이지 로드 시 초기화 함수 실행 */
-document.addEventListener("DOMContentLoaded",()=>{
-  const path=location.pathname;
-  if(path.endsWith("index.html") || path.endsWith("/")){
-    initArchive();
-  }else if(path.endsWith("member.html")){
-    initMember();
-  }else if(path.endsWith("chat.html")){
-    initChat();
-  }
-  // ⭐ 추가: 미디어 팝업 버튼 이벤트 리스너 연결 ⭐
-  if (closeMediaModalBtn) {
-    closeMediaModalBtn.addEventListener('click', closeMediaModal);
-  }
-  if (mediaModal) {
-    // 모달 배경 클릭 시 닫기
-    mediaModal.addEventListener('click', (e) => {
-        if (e.target === mediaModal) {
-            closeMediaModal();
-        }
-    });
-  }
-  if (prevMediaBtn) {
-    prevMediaBtn.addEventListener('click', showPrevMedia);
-  }
-  if (nextMediaBtn) {
-    nextMediaBtn.addEventListener('click', showNextMedia);
-  }
-});
+     
