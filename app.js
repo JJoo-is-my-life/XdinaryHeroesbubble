@@ -114,15 +114,19 @@ async function initMember(){
             bg.src = historyData[0].path;
         }
 
+        // ⭐ 기존 배경 이미지 클릭 이벤트 수정 ⭐
         bg.addEventListener("click", () => {
             if (historyData.length > 0) {
+                // 히스토리가 있다면 최신 이미지부터 팝업 열기
                 openMediaModal(historyData[0].path, historyData[0].type, historyData, 0);
             } else {
+                // 히스토리가 없다면 현재 배경 이미지만으로 팝업 열기
                 openMediaModal(bg.src, getMediaType(bg.src), [{ path: bg.src, type: getMediaType(bg.src), type_orig: 'background' }], 0);
             }
         });
     } catch (error) {
         console.error("Error loading background history:", error);
+        // 오류 발생 시에도 현재 이미지로 팝업을 열 수 있도록 폴백 처리
         if (bg) {
             bg.addEventListener("click", () => {
                 openMediaModal(bg.src, getMediaType(bg.src), [{ path: bg.src, type: getMediaType(bg.src), type_orig: 'background' }], 0);
@@ -153,15 +157,19 @@ async function initMember(){
             prof.src = historyData[0].path;
         }
 
+        // ⭐ 기존 프로필 이미지 클릭 이벤트 수정 ⭐
         prof.addEventListener("click", () => {
             if (historyData.length > 0) {
+                // 히스토리가 있다면 최신 이미지부터 팝업 열기
                 openMediaModal(historyData[0].path, historyData[0].type, historyData, 0);
             } else {
+                // 히스토리가 없다면 현재 프로필 이미지만으로 팝업 열기
                 openMediaModal(prof.src, getMediaType(prof.src), [{ path: prof.src, type: getMediaType(prof.src), type_orig: 'profile' }], 0);
             }
         });
     } catch (error) {
         console.error("Error loading profile history:", error);
+        // 오류 발생 시에도 현재 이미지로 팝업을 열 수 있도록 폴백 처리
         if (prof) {
             prof.addEventListener("click", () => {
                 openMediaModal(prof.src, getMediaType(prof.src), [{ path: prof.src, type: getMediaType(prof.src), type_orig: 'profile' }], 0);
@@ -231,19 +239,19 @@ function parseCsv(csvText) {
 }
 
 
-// ⭐ 미디어 모달 관련 DOM 요소 참조 변수 추가 ⭐ (이제 member.html에서 찾게 됨)
+// ⭐ 추가: 미디어 모달 관련 DOM 요소 참조 변수 ⭐
 const mediaModal = qs("#mediaModal");
 const closeMediaModalBtn = qs("#closeMediaModal");
 const modalImage = qs("#modalImage");
 const modalVideo = qs("#modalVideo");
 const downloadMediaBtn = qs("#downloadMediaBtn");
-// ⭐ 히스토리 내비게이션 버튼 추가 ⭐
 const prevMediaBtn = qs("#prevMediaBtn");
 const nextMediaBtn = qs("#nextMediaBtn");
 
 let currentMediaHistory = [];
 let currentMediaIndex = 0;
 
+// ⭐ 추가: 파일 경로를 기반으로 미디어 타입(이미지/비디오)을 결정하는 함수 ⭐
 function getMediaType(path) {
     if (/\.(mp4|mov|webm|ogg)$/i.test(path)) {
         return 'video';
@@ -253,6 +261,98 @@ function getMediaType(path) {
     return 'unknown';
 }
 
+// ⭐ 추가: 미디어 팝업을 여는 함수 ⭐
+function openMediaModal(mediaUrl, mediaType, historyData = [], initialIndex = 0) {
+    if (!mediaModal || !modalImage || !modalVideo || !downloadMediaBtn) {
+        console.error("미디어 모달 관련 DOM 요소를 찾을 수 없습니다. member.html에 mediaModal 구조가 있는지 확인해주세요.");
+        return;
+    }
+
+    modalImage.style.display = 'none';
+    modalVideo.style.display = 'none';
+    modalVideo.pause(); // 비디오 재생 중지
+
+    currentMediaHistory = historyData; // 현재 히스토리 데이터 설정
+    currentMediaIndex = initialIndex; // 초기 인덱스 설정
+
+    updateMediaModalContent(); // 모달 내용 업데이트
+
+    mediaModal.classList.remove('hidden'); // hidden 클래스 제거하여 모달 표시
+    document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+
+    updateMediaNavButtons(); // 이전/다음 버튼 상태 업데이트
+}
+
+// ⭐ 추가: 미디어 팝업 콘텐츠를 업데이트하는 함수 ⭐
+function updateMediaModalContent() {
+    const mediaItem = currentMediaHistory[currentMediaIndex];
+    if (!mediaItem) {
+        console.error("Invalid media history item or index:", currentMediaIndex, currentMediaHistory);
+        return;
+    }
+
+    modalImage.style.display = 'none';
+    modalVideo.style.display = 'none';
+    modalVideo.pause();
+    modalVideo.currentTime = 0; // 비디오 초기화
+
+    if (mediaItem.type === 'image' || mediaItem.type_orig === 'image') { // type_orig도 확인
+        modalImage.src = mediaItem.path;
+        modalImage.style.display = 'block';
+    } else if (mediaItem.type === 'video' || mediaItem.type_orig === 'video') { // type_orig도 확인
+        modalVideo.src = mediaItem.path;
+        modalVideo.style.display = 'block';
+        modalVideo.load(); // 비디오 로드
+    } else {
+        console.warn("Unknown media type or missing path in history item:", mediaItem);
+    }
+
+    downloadMediaBtn.href = mediaItem.path;
+    const fileName = mediaItem.path.split('/').pop().split('?')[0];
+    downloadMediaBtn.download = fileName; // 다운로드 파일명 설정
+}
+
+// ⭐ 추가: 미디어 팝업 이전/다음 버튼 상태를 업데이트하는 함수 ⭐
+function updateMediaNavButtons() {
+    if (prevMediaBtn) {
+        prevMediaBtn.disabled = currentMediaIndex === 0; // 첫 번째 미디어면 이전 버튼 비활성화
+    }
+    if (nextMediaBtn) {
+        nextMediaBtn.disabled = currentMediaIndex === currentMediaHistory.length - 1; // 마지막 미디어면 다음 버튼 비활성화
+    }
+}
+
+// ⭐ 추가: 다음 미디어를 보여주는 함수 ⭐
+function showNextMedia() {
+    if (currentMediaIndex < currentMediaHistory.length - 1) {
+        currentMediaIndex++;
+        updateMediaModalContent();
+        updateMediaNavButtons();
+    }
+}
+
+// ⭐ 추가: 이전 미디어를 보여주는 함수 ⭐
+function showPrevMedia() {
+    if (currentMediaIndex > 0) {
+        currentMediaIndex--;
+        updateMediaModalContent();
+        updateMediaNavButtons();
+    }
+}
+
+// ⭐ 추가: 미디어 팝업을 닫는 함수 ⭐
+function closeMediaModal() {
+    if (mediaModal) {
+        mediaModal.classList.add('hidden'); // hidden 클래스 추가하여 모달 숨김
+        modalImage.src = ''; // 이미지 src 초기화
+        modalVideo.src = ''; // 비디오 src 초기화
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+        document.body.style.overflow = ''; // 배경 스크롤 허용
+        currentMediaHistory = []; // 히스토리 초기화
+        currentMediaIndex = 0; // 인덱스 초기화
+    }
+}
 
 function renderChat(box, data, memberId){
   box.innerHTML="";
@@ -300,9 +400,11 @@ function renderChat(box, data, memberId){
       return;
     }
 
+    // ⭐ 채팅 메시지 내 이미지/동영상 클릭 이벤트 추가 ⭐
     if (mediaUrl) {
-        msgContent.style.cursor = 'pointer';
+        msgContent.style.cursor = 'pointer'; // 클릭 가능 시 커서 변경
         msgContent.addEventListener('click', () => {
+            // 채팅 내 미디어는 히스토리 없이 단일 미디어로 팝업
             openMediaModal(mediaUrl, mediaType, [{ path: mediaUrl, type: mediaType, type_orig: 'chat' }], 0);
         });
     }
@@ -350,92 +452,6 @@ async function loadChatData(id){
   }
 }
 
-function openMediaModal(mediaUrl, mediaType, historyData = [], initialIndex = 0) {
-    if (!mediaModal || !modalImage || !modalVideo || !downloadMediaBtn) {
-        console.error("미디어 모달 관련 DOM 요소를 찾을 수 없습니다.");
-        return;
-    }
-
-    modalImage.style.display = 'none';
-    modalVideo.style.display = 'none';
-    modalVideo.pause();
-
-    currentMediaHistory = historyData;
-    currentMediaIndex = initialIndex;
-
-    updateMediaModalContent();
-
-    mediaModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-
-    updateMediaNavButtons();
-}
-
-function updateMediaModalContent() {
-    const mediaItem = currentMediaHistory[currentMediaIndex];
-    if (!mediaItem) {
-        console.error("Invalid media history item or index:", currentMediaIndex, currentMediaHistory);
-        return;
-    }
-
-    modalImage.style.display = 'none';
-    modalVideo.style.display = 'none';
-    modalVideo.pause();
-    modalVideo.currentTime = 0;
-
-    if (mediaItem.type === 'image' || mediaItem.type_orig === 'image') {
-        modalImage.src = mediaItem.path;
-        modalImage.style.display = 'block';
-    } else if (mediaItem.type === 'video' || mediaItem.type_orig === 'video') {
-        modalVideo.src = mediaItem.path;
-        modalVideo.style.display = 'block';
-        modalVideo.load();
-    } else {
-        console.warn("Unknown media type or missing path:", mediaItem);
-    }
-
-    downloadMediaBtn.href = mediaItem.path;
-    const fileName = mediaItem.path.split('/').pop().split('?')[0];
-    downloadMediaBtn.download = fileName;
-}
-
-function updateMediaNavButtons() {
-    if (prevMediaBtn) {
-        prevMediaBtn.disabled = currentMediaIndex === 0;
-    }
-    if (nextMediaBtn) {
-        nextMediaBtn.disabled = currentMediaIndex === currentMediaHistory.length - 1;
-    }
-}
-
-function showNextMedia() {
-    if (currentMediaIndex < currentMediaHistory.length - 1) {
-        currentMediaIndex++;
-        updateMediaModalContent();
-        updateMediaNavButtons();
-    }
-}
-
-function showPrevMedia() {
-    if (currentMediaIndex > 0) {
-        currentMediaIndex--;
-        updateMediaModalContent();
-        updateMediaNavButtons();
-    }
-}
-
-function closeMediaModal() {
-    if (mediaModal) {
-        mediaModal.classList.add('hidden');
-        modalImage.src = '';
-        modalVideo.src = '';
-        modalVideo.pause();
-        modalVideo.currentTime = 0;
-        document.body.style.overflow = '';
-        currentMediaHistory = [];
-        currentMediaIndex = 0;
-    }
-}
 
 /* 닉네임 설정 모달 관련 함수 */
 function openNickModal(){
@@ -463,14 +479,6 @@ function saveNickname(){
 }
 
 
-// ⭐ initViewer 함수는 이제 필요 없으므로 제거합니다. ⭐
-/*
-async function initViewer() {
-    // ... (이전 initViewer 내용) ...
-}
-*/
-
-
 /* 페이지 로드 시 초기화 함수 실행 */
 document.addEventListener("DOMContentLoaded",()=>{
   const path=location.pathname;
@@ -481,15 +489,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   }else if(path.endsWith("chat.html")){
     initChat();
   }
-  // ⭐ viewer.html 초기화 호출 부분도 제거합니다. ⭐
-  // else if(path.endsWith("viewer.html")){
-  //   initViewer();
-  // }
-
+  // ⭐ 추가: 미디어 팝업 버튼 이벤트 리스너 연결 ⭐
   if (closeMediaModalBtn) {
     closeMediaModalBtn.addEventListener('click', closeMediaModal);
   }
   if (mediaModal) {
+    // 모달 배경 클릭 시 닫기
     mediaModal.addEventListener('click', (e) => {
         if (e.target === mediaModal) {
             closeMediaModal();
