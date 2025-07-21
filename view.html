@@ -4,96 +4,261 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>멤버 상세 보기</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
+    <link rel="stylesheet" href="style.css"> <style>
         /* view.html 전용 스타일 */
         body {
             margin: 0;
-            overflow-x: hidden; /* 가로 스크롤 방지 */
-            background-color: #f0f2f5; /* 기본 배경색 */
+            overflow: hidden; /* 스크롤바 제거 */
+            background-color: #000; /* 기본 배경색 (검은색) */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
         }
 
-        .full-background {
-            width: 100%;
-            height: 100vh; /* 뷰포트 높이에 맞춤 */
-            object-fit: cover; /* 비율 유지하며 채움 */
-            position: fixed; /* 스크롤해도 배경 고정 */
+        /* 배경 이미지 영역 */
+        .background-container {
+            position: absolute;
             top: 0;
             left: 0;
-            z-index: -1; /* 다른 콘텐츠 뒤로 보냄 */
-            filter: none; /* 블러 제거 */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* 이미지 넘치는 부분 숨김 */
         }
 
-        .content-area {
-            position: relative;
-            z-index: 1; /* 배경 위에 표시 */
-            background-color: rgba(255, 255, 255, 0.9); /* 콘텐츠 영역 배경 (반투명 흰색) */
-            padding: 20px;
-            padding-top: 100px; /* 프로필 사진 아래로 충분한 여백 확보 */
-            margin-top: 50vh; /* 배경을 절반 정도 가리고 시작하도록 조정 */
-            min-height: 100vh; /* 콘텐츠 영역이 최소한 뷰포트 높이만큼 되도록 */
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); /* 상단 그림자 */
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+        #viewBackground {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 비율 유지하며 전체 영역을 채움 */
+            filter: brightness(0.7); /* 배경을 약간 어둡게 처리하여 프로필이 더 잘 보이도록 */
         }
 
-        .detail-profile-img {
-            width: 200px; /* 프로필 사진 크기 */
-            height: 200px;
+        /* 프로필 사진 컨테이너 */
+        .profile-container {
+            position: absolute;
+            bottom: 5vh; /* 하단에서 5% 위로 배치 */
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #viewProfile {
+            width: 150px; /* 프로필 사진 크기 */
+            height: 150px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid white; /* 흰색 테두리 */
-            display: block; /* 가운데 정렬을 위해 */
-            margin: 0 auto 20px; /* 가운데 정렬 및 하단 여백 */
-            transform: translateY(-100px); /* content-area 위로 일부 겹치도록 조정 (조정 필요 시) */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            background-color: #fff; /* 로딩 중 흰색 배경 */
+            border: 3px solid rgba(255, 255, 255, 0.8); /* 흰색 테두리 */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* 그림자 */
+            cursor: pointer; /* 클릭 가능한 요소임을 표시 */
+            transition: transform 0.2s ease-in-out;
         }
 
-        .member-info {
-            text-align: center;
-            margin-bottom: 20px;
-            /* transform: translateY(-100px); 이전 프로필 위치 조정을 보정 */
+        #viewProfile:hover {
+            transform: scale(1.05); /* 호버 시 약간 확대 */
         }
-        .member-info h1 {
-            color: #333;
-            font-size: 2.2em;
-            margin-bottom: 10px;
+
+        #viewDisplayName {
+            color: #fff;
+            font-size: 1.8em;
+            margin-top: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
         }
-        .member-info p {
-            color: #666;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
+
+        /* 나가기 버튼 (X 버튼) */
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* 최상단에 위치 */
+            transition: background 0.2s;
         }
-        /* 기타 섹션 스타일 */
-        .additional-content {
-            padding: 20px;
-            max-width: 960px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+
+        .close-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* 닉네임 설정창과 동일한 가로 폭을 위한 기준 (app.js의 닉네임 모달 스타일과 맞춰야 함) */
+        /* 이 예시에서는 닉네임 모달 폭을 320px로 가정합니다. */
+        .modal-base-width {
+            width: 320px; /* 닉네임 설정창의 가로 폭과 동일하게 설정 */
+            max-width: 90vw; /* 너무 커지지 않도록 최대 너비 설정 */
+        }
+
+
+        /* ===== 미디어 팝업 스타일 (view.html 전용) ===== */
+        #mediaModalView {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* 배경 어둡게 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        #mediaModalView.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content-view {
+            position: relative;
+            background: #fff; /* 배경색 변경 가능 */
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+        }
+
+        .modal-content-view img,
+        .modal-content-view video {
+            max-width: 100%; /* 부모 너비에 맞춤 */
+            height: auto; /* 원본 비율 유지 */
+            display: block;
+            border-radius: 5px;
+        }
+
+        .modal-controls-view {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .modal-controls-view .nav-button,
+        .modal-controls-view .close-button-view,
+        .modal-controls-view .download-button-view {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+        .modal-controls-view .nav-button:hover,
+        .modal-controls-view .close-button-view:hover,
+        .modal-controls-view .download-button-view:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-controls-view .nav-button[disabled] {
+            background: rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+
+        .modal-arrow-buttons {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .modal-arrow-buttons .arrow-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .modal-arrow-buttons .arrow-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .modal-arrow-buttons .arrow-btn[disabled] {
+            background: rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+        }
+
+        .download-button-view {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        .download-button-view:hover {
+            background: rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
 <body>
-    <img id="detailBackground" class="full-background" src="" alt="멤버 배경 이미지">
+    <div class="background-container">
+        <img id="viewBackground" src="" alt="멤버 배경 이미지">
+    </div>
 
-    <div class="content-area">
-        <img id="detailProfile" class="detail-profile-img" src="" alt="멤버 프로필 이미지">
-        <div class="member-info">
-            <h1 id="detailDisplayName"></h1>
-            <p>이곳에 멤버의 상세 정보를 추가할 수 있습니다. 예를 들어, 멤버의 경력, 주요 활동, 취미 등을 자유롭게 작성하여 팬들에게 더 많은 정보를 제공할 수 있습니다.</p>
-        </div>
+    <div class="profile-container">
+        <img id="viewProfile" src="" alt="멤버 프로필 이미지">
+        <div id="viewDisplayName"></div>
+    </div>
 
-        <div class="additional-content">
-            <h2>멤버의 추가 콘텐츠</h2>
-            <p>이곳에 멤버와 관련된 사진 갤러리, 비디오 링크, 또는 다른 팬 콘텐츠 섹션을 추가할 수 있습니다.</p>
+    <button class="close-button" onclick="history.back()">×</button>
+
+    <div id="mediaModalView" class="hidden">
+        <div class="modal-content-view modal-base-width">
+            <img id="modalImageView" src="" alt="확대 이미지" style="display: none;">
+            <video id="modalVideoView" controls style="display: none;"></video>
+
+            <div class="modal-arrow-buttons">
+                <button id="prevMediaBtnView" class="arrow-btn">‹</button>
+                <button id="nextMediaBtnView" class="arrow-btn">›</button>
             </div>
+
+            <button id="closeMediaBtnView" class="close-button-view">×</button>
+            <a id="downloadMediaBtnView" class="download-button-view" download>저장</a>
         </div>
+    </div>
 
     <script src="app.js"></script>
+    <script>
+        // view.html 전용 초기화 함수 호출은 app.js의 DOMContentLoaded에서 처리됩니다.
+    </script>
 </body>
 </html>
