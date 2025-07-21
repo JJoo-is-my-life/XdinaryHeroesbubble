@@ -611,3 +611,70 @@ document.addEventListener("DOMContentLoaded",()=>{
     nextMediaBtn.addEventListener('click', showNextMedia);
   }
 });
+member.html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Xdinary Heroes bubble</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<script defer src="app.js"></script>
+</head>
+<body class="app-bg">
+<div id="app" class="app-frame app-frame--profile">
+<button class="exit-button" onclick="history.back()">✕</button>
+  <div id="memberBgWrap" class="member-bg-wrap">
+    <img id="memberBg" class="member-bg" alt="">
+  </div>
+  <div class="member-profile-card">
+    <img id="memberProfile" class="member-profile-img" alt="">
+    <h2 id="memberDisplayName" class="member-name"></h2>
+    <button id="viewChatBtn" class="primary-btn wide-btn">전체 채팅 보기</button>
+  </div>
+</div>
+</body>
+</html>
+viewer.html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>Xdinary Heroes Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+</head>
+<body class="app-bg">
+  <div id="app" class="app-frame app-frame--profile-viewer">
+
+    <button class="exit-button" onclick="history.back()">×</button>
+
+    <div class="viewer-bg-wrap">
+      <img id="viewerBg" class="viewer-bg" src="" alt="Member Background">
+    </div>
+
+    <div class="viewer-profile-card">
+      <img id="viewerProfile" class="viewer-profile-img" src="" alt="Member Profile Image">
+      <h2 id="viewerDisplayName" class="viewer-name"></h2>
+      </div>
+
+    <div id="mediaModal" class="media-modal hidden">
+        <div class="media-modal-content">
+            <button id="prevMediaBtn" class="media-nav-btn media-nav-btn--prev"><i class="fas fa-chevron-left"></i></button>
+            
+            <button id="closeMediaModal" class="media-modal-close-btn">&times;</button>
+            
+            <img id="modalImage" class="modal-media" src="" alt="확대 이미지" style="display:none;">
+            <video id="modalVideo" class="modal-media" src="" controls style="display:none;"></video>
+            
+            <a id="downloadMediaBtn" class="media-modal-download-btn" download><i class="fas fa-download"></i> 저장</a>
+            
+            <button id="nextMediaBtn" class="media-nav-btn media-nav-btn--next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+  </div>
+</body>
+</html>
